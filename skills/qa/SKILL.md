@@ -65,7 +65,7 @@ Options:
 - A) Update now (recommended)
 - B) Skip — continue with current version
 
-If A: run `claude plugin add github:avadco/betoo` via Bash, then tell the user "Updated to v{new}! Please re-run the command in a new session to use the latest version." and stop.
+If A: run `claude plugin update betoo@avadco-betoo` via Bash, then tell the user "Updated to v{new}! Please re-run the command in a new session to use the latest version." and stop.
 If B: continue with the skill normally.
 
 If `JUST_UPGRADED <from> <to>`: tell user "Running betoo v{to} (just updated!)" and continue.
