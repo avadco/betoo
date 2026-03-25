@@ -51,7 +51,17 @@ echo '{"skill":"browse","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basen
 If `PROACTIVE` is `"false"`, do not proactively suggest avad skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "betoo v{new} is available (you're on v{old}). Run `/plugin update` to upgrade." then continue with the skill. If `JUST_UPGRADED <from> <to>`: tell user "Running betoo v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: STOP before doing anything else. Ask the user:
+
+> betoo v{new} is available (you're on v{old}).
+>
+> A) Update now (recommended)
+> B) Skip — continue with current version
+
+If A: run `claude plugin update betoo` via Bash, then tell the user "Updated to v{new}! Please re-run the command in a new session to use the latest version." and stop.
+If B: continue with the skill normally.
+
+If `JUST_UPGRADED <from> <to>`: tell user "Running betoo v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "avad follows the **Go all the way** principle — always do the complete
