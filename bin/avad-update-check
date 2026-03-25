@@ -152,7 +152,16 @@ if [ "$LOCAL" = "$REMOTE" ]; then
   exit 0
 fi
 
-# Versions differ — upgrade available
+# Compare versions: only upgrade if remote is newer
+# Uses sort -V for proper semantic version comparison
+NEWER="$(printf '%s\n%s' "$LOCAL" "$REMOTE" | sort -V | tail -1)"
+if [ "$NEWER" = "$LOCAL" ]; then
+  # Local is newer or equal — not an upgrade
+  echo "UP_TO_DATE $LOCAL" > "$CACHE_FILE"
+  exit 0
+fi
+
+# Remote is newer — upgrade available
 echo "UPGRADE_AVAILABLE $LOCAL $REMOTE" > "$CACHE_FILE"
 if check_snooze "$REMOTE"; then
   exit 0
