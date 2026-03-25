@@ -1,6 +1,6 @@
 {
   "name": "betoo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "AI-powered specialist workflows for Claude Code. Use for /betoo:review, /betoo:ship, /betoo:qa, /betoo:browse, /betoo:investigate, /betoo:retro, /betoo:founder, /betoo:plan-eng-review, /betoo:plan-design-review, /betoo:design-consultation, /betoo:design-review, /betoo:autoplan, /betoo:document-release, /betoo:codex, /betoo:qa-only, or /betoo:setup-browser-cookies.",
   "author": {
     "name": "avadco",
