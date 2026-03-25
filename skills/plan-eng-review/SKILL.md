@@ -55,7 +55,7 @@ echo '{"skill":"plan-eng-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":
 If `PROACTIVE` is `"false"`, do not proactively suggest avad skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `${CLAUDE_PLUGIN_ROOT}/avad-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running avad v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: tell the user "betoo v{new} is available (you're on v{old}). Run `/plugin update` to upgrade." then continue with the skill. If `JUST_UPGRADED <from> <to>`: tell user "Running betoo v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "avad follows the **Go all the way** principle — always do the complete
