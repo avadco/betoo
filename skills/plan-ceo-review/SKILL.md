@@ -1,5 +1,5 @@
 ---
-name: plan-ceo-review
+name: Founder
 preamble-tier: 3
 version: 1.0.0
 description: |
