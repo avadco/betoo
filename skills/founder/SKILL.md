@@ -3,7 +3,7 @@ name: Founder
 preamble-tier: 3
 version: 1.0.0
 description: |
-  MANUAL TRIGGER ONLY: invoke only when user types /avad:plan-ceo-review.
+  MANUAL TRIGGER ONLY: invoke only when user types /betoo:founder.
   CEO/founder-mode plan review. Rethink the problem, find the 10-star product,
   challenge premises, expand scope when it creates a better product. Four modes:
   SCOPE EXPANSION (dream big), SELECTIVE EXPANSION (hold scope + cherry-pick

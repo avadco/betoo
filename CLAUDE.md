@@ -12,7 +12,7 @@ AI-powered specialist workflows. Each `/betoo:command` activates a different mod
 | `/betoo:browse` | Headless Chromium (~100ms/command) — navigate, click, screenshot, assert |
 | `/betoo:investigate` | Systematic debugger — investigate, analyze, hypothesize, implement |
 | `/betoo:retro` | Weekly retrospective — commit analysis, per-person breakdown, trend tracking |
-| `/betoo:plan-ceo-review` | Product thinking — challenge premises, expand scope, find the real product |
+| `/betoo:founder` | Product thinking — challenge premises, expand scope, find the real product |
 | `/betoo:plan-eng-review` | Architecture review — data flow, failure modes, test matrix |
 | `/betoo:plan-design-review` | Designer's eye — rates dimensions 0-10, fixes to improve |
 | `/betoo:design-consultation` | Design system creation — researches space, proposes aesthetic, writes DESIGN.md |
