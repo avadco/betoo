@@ -53,14 +53,15 @@ echo '{"skill":"document-release","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo"
 If `PROACTIVE` is `"false"`, do not proactively suggest avad skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: STOP before doing anything else. Ask the user:
+If output shows `UPGRADE_AVAILABLE <old> <new>`: STOP before doing anything else. Use AskUserQuestion with this message:
 
-> betoo v{new} is available (you're on v{old}).
->
-> A) Update now (recommended)
-> B) Skip — continue with current version
+"betoo v{new} is available (you're on v{old})."
 
-If A: run `claude plugin update betoo` via Bash, then tell the user "Updated to v{new}! Please re-run the command in a new session to use the latest version." and stop.
+Options:
+- A) Update now (recommended)
+- B) Skip — continue with current version
+
+If A: run `claude plugin update betoo@avadco-betoo` via Bash, then tell the user "Updated to v{new}! Please re-run the command in a new session to use the latest version." and stop.
 If B: continue with the skill normally.
 
 If `JUST_UPGRADED <from> <to>`: tell user "Running betoo v{to} (just updated!)" and continue.
