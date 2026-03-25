@@ -1,0 +1,20 @@
+{
+  "name": "avadco-betoo",
+  "owner": {
+    "name": "avadco",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "betoo",
+      "description": "AI-powered specialist workflows — review, QA, ship, design, debug, and more. Each slash command activates a different mode.",
+      "version": "0.0.1",
+      "author": {
+        "name": "avadco",
+        "email": ""
+      },
+      "source": "./.",
+      "category": "productivity"
+    }
+  ]
+}

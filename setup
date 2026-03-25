@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# betoo setup — ensure browse binary works + install Playwright Chromium
+set -e
+
+BETOO_DIR="$(cd "$(dirname "$0")" && pwd)"
+BROWSE_BIN="$BETOO_DIR/skills/browse/dist/browse"
+
+# Platform detection (Windows via Git Bash / MSYS2 / Cygwin)
+IS_WINDOWS=0
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
+esac
+
+# 1. Check browse binary exists
+if [ ! -x "$BROWSE_BIN" ]; then
+  echo "warning: browse binary not found at $BROWSE_BIN" >&2
+  echo "  /betoo:browse will not work until the binary is built" >&2
+fi
+
+# Helper: verify Playwright Chromium can launch
+ensure_playwright() {
+  if [ "$IS_WINDOWS" -eq 1 ]; then
+    # Bun cannot launch Chromium on Windows (oven-sh/bun#4253) — use Node.js
+    (cd "$BETOO_DIR" && node -e "const { chromium } = require('playwright'); (async () => { const b = await chromium.launch(); await b.close(); })()" 2>/dev/null)
+  else
+    (cd "$BETOO_DIR" && bun --eval 'import { chromium } from "playwright"; const b = await chromium.launch(); await b.close();' 2>/dev/null)
+  fi
+}
+
+# 2. Install dependencies + Playwright Chromium
+if [ -x "$BROWSE_BIN" ]; then
+  echo "Checking Playwright Chromium..."
+
+  if [ "$IS_WINDOWS" -eq 1 ]; then
+    # Windows: require Node.js (Bun can't launch Chromium — pipe bug)
+    if ! command -v node >/dev/null 2>&1; then
+      echo "error: Node.js is required on Windows (Bun cannot launch Chromium due to oven-sh/bun#4253)" >&2
+      echo "  Install Node.js: https://nodejs.org/" >&2
+      exit 1
+    fi
+    (cd "$BETOO_DIR" && npm install 2>/dev/null)
+    node -e "require('playwright')" 2>/dev/null || (cd "$BETOO_DIR" && npm install --no-save playwright)
+  elif command -v bun >/dev/null 2>&1; then
+    (cd "$BETOO_DIR" && bun install --frozen-lockfile 2>/dev/null || bun install)
+  elif command -v npm >/dev/null 2>&1; then
+    (cd "$BETOO_DIR" && npm install 2>/dev/null)
+  else
+    echo "warning: bun or npm required for Playwright — /betoo:browse may not work" >&2
+  fi
+
+  if ! ensure_playwright; then
+    echo "Installing Playwright Chromium..."
+    if [ "$IS_WINDOWS" -eq 1 ]; then
+      (cd "$BETOO_DIR" && npx playwright install chromium)
+    elif command -v bun >/dev/null 2>&1; then
+      (cd "$BETOO_DIR" && bunx playwright install chromium)
+    elif command -v npx >/dev/null 2>&1; then
+      (cd "$BETOO_DIR" && npx playwright install chromium)
+    fi
+  fi
+
+  if ! ensure_playwright; then
+    if [ "$IS_WINDOWS" -eq 1 ]; then
+      echo "warning: Playwright Chromium could not launch via Node.js" >&2
+      echo "  This is a known issue with Bun on Windows (oven-sh/bun#4253)." >&2
+      echo "  Ensure Node.js is installed and 'node -e \"require('playwright')\"' works." >&2
+    else
+      echo "warning: Playwright Chromium could not launch — /betoo:browse may not work" >&2
+    fi
+  fi
+fi
+
+# 3. Create state directory
+mkdir -p "${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects"
+
+echo "betoo ready ($(cat "$BETOO_DIR/VERSION" 2>/dev/null || echo '?'))"
+echo "  skills: $(ls -d "$BETOO_DIR"/skills/*/ 2>/dev/null | wc -l | tr -d ' ')"
+echo "  browse: $BROWSE_BIN"
+[ "$IS_WINDOWS" -eq 1 ] && echo "  platform: Windows (Node.js fallback for Playwright)"

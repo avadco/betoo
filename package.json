@@ -1,0 +1,13 @@
+{
+  "name": "betoo",
+  "version": "0.0.1",
+  "description": "AI-powered specialist workflows for Claude Code",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avadco/betoo"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}
