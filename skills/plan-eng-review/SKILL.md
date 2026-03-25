@@ -28,10 +28,10 @@ allowed-tools:
 ```bash
 _UPD=$(${CLAUDE_PLUGIN_ROOT}/bin/avad-update-check 2>/dev/null || ${CLAUDE_PLUGIN_ROOT}/bin/avad-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ${CLAUDE_PLUGIN_DATA}/sessions
-touch ${CLAUDE_PLUGIN_DATA}/sessions/"$PPID"
-_SESSIONS=$(find ${CLAUDE_PLUGIN_DATA}/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ${CLAUDE_PLUGIN_DATA}/sessions -mmin +120 -type f -delete 2>/dev/null || true
+mkdir -p ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/sessions
+touch ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/sessions/"$PPID"
+_SESSIONS=$(find ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _CONTRIB=$(${CLAUDE_PLUGIN_ROOT}/bin/avad-config get avad_contributor 2>/dev/null || true)
 _PROACTIVE=$(${CLAUDE_PLUGIN_ROOT}/bin/avad-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
@@ -42,13 +42,13 @@ REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(${CLAUDE_PLUGIN_ROOT}/bin/avad-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ${CLAUDE_PLUGIN_DATA}/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ${CLAUDE_PLUGIN_DATA}/analytics
-echo '{"skill":"plan-eng-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ${CLAUDE_PLUGIN_DATA}/analytics/skill-usage.jsonl 2>/dev/null || true
+mkdir -p ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics
+echo '{"skill":"plan-eng-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
 ```
 
@@ -94,7 +94,7 @@ If B→B: run `${CLAUDE_PLUGIN_ROOT}/bin/avad-config set telemetry off`
 
 Always run:
 ```bash
-touch ${CLAUDE_PLUGIN_DATA}/.telemetry-prompted
+touch ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
@@ -141,7 +141,7 @@ Before building anything unfamiliar, **search first.** See `${CLAUDE_PLUGIN_ROOT
 
 **Eureka:** When first-principles reasoning contradicts conventional wisdom, name it and log:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ${CLAUDE_PLUGIN_DATA}/analytics/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics/eureka.jsonl 2>/dev/null || true
 ```
 
 ## Contributor Mode
@@ -150,7 +150,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. At the end of each maj
 
 **File only:** avad tooling bugs where the input was reasonable but avad failed. **Skip:** user app bugs, network errors, auth failures on user's site.
 
-**To file:** write `${CLAUDE_PLUGIN_DATA}/contributor-logs/{slug}.md`:
+**To file:** write `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/contributor-logs/{slug}.md`:
 ```
 # {Title}
 **What I tried:** {action} | **What happened:** {result} | **Rating:** {0-10}
@@ -195,7 +195,7 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`${CLAUDE_PLUGIN_DATA}/analytics/` (user config directory, not project files). The skill
+`${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics/` (user config directory, not project files). The skill
 preamble already writes to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
@@ -204,7 +204,7 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ${CLAUDE_PLUGIN_DATA}/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
+rm -f ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -298,8 +298,8 @@ When evaluating architecture, think "boring by default." When reviewing tests, t
 ```bash
 SLUG=$(${CLAUDE_PLUGIN_ROOT}/browse/bin/remote-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
-DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA}/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
-[ -z "$DESIGN" ] && DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA}/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
+DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+[ -z "$DESIGN" ] && DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
 If a design doc exists, read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design — check the prior version for context on what changed and why.
@@ -347,8 +347,8 @@ After /avad:office-hours completes, re-run the design doc check:
 ```bash
 SLUG=$(${CLAUDE_PLUGIN_ROOT}/browse/bin/remote-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
-DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA}/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
-[ -z "$DESIGN" ] && DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA}/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
+DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+[ -z "$DESIGN" ] && DESIGN=$(ls -t ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
 
@@ -581,12 +581,12 @@ The plan should be complete enough that when implementation begins, every test i
 After producing the coverage diagram, write a test plan artifact to the project directory so `/avad:qa` and `/avad:qa-only` can consume it as primary test input:
 
 ```bash
-eval "$(${CLAUDE_PLUGIN_ROOT}/bin/avad-slug 2>/dev/null)" && mkdir -p ${CLAUDE_PLUGIN_DATA}/projects/$SLUG
+eval "$(${CLAUDE_PLUGIN_ROOT}/bin/avad-slug 2>/dev/null)" && mkdir -p ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
-Write to `${CLAUDE_PLUGIN_DATA}/projects/{slug}/{user}-{branch}-eng-review-test-plan-{datetime}.md`:
+Write to `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/{slug}/{user}-{branch}-eng-review-test-plan-{datetime}.md`:
 
 ```markdown
 # Test Plan
@@ -813,8 +813,8 @@ Check the git log for this branch. If there are prior commits suggesting a previ
 After producing the Completion Summary above, persist the review result.
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
-`${CLAUDE_PLUGIN_DATA}/` (user config directory, not project files). The skill preamble
-already writes to `${CLAUDE_PLUGIN_DATA}/sessions/` and `${CLAUDE_PLUGIN_DATA}/analytics/` — this is
+`${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/` (user config directory, not project files). The skill preamble
+already writes to `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/sessions/` and `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/analytics/` — this is
 the same pattern. The review dashboard depends on this data. Skipping this
 command breaks the review readiness dashboard in /avad:ship.
 

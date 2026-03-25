@@ -189,8 +189,8 @@ mkdir -p ~/.avad
 ```
 
 Append one line per triage outcome to **both** files (per-project for suppressions, global for retro):
-- `${CLAUDE_PLUGIN_DATA}/projects/$REMOTE_SLUG/greptile-history.md` (per-project)
-- `${CLAUDE_PLUGIN_DATA}/greptile-history.md` (global aggregate)
+- `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$REMOTE_SLUG/greptile-history.md` (per-project)
+- `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/greptile-history.md` (global aggregate)
 
 Format:
 ```

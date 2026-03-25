@@ -8,7 +8,7 @@
 #   Collaborative: top author < 80%
 #
 # Override: avad-config set repo_mode solo|collaborative
-# Cache:    ${CLAUDE_PLUGIN_DATA}/projects/$SLUG/repo-mode.json (7-day TTL)
+# Cache:    ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/$SLUG/repo-mode.json (7-day TTL)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

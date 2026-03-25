@@ -25,5 +25,5 @@ AI-powered specialist workflows. Each `/betoo:command` activates a different mod
 
 ## Data
 
-- State: `${CLAUDE_PLUGIN_DATA}/projects/<slug>/`
+- State: `${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects/<slug>/`
 - Project-local: `.betoo/` in repo root

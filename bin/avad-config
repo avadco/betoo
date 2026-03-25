@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# avad-config — read/write ${CLAUDE_PLUGIN_DATA}/config.yaml
+# avad-config — read/write ${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/config.yaml
 #
 # Usage:
 #   avad-config get <key>          — read a config value
