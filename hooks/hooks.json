@@ -1,0 +1,16 @@
+{
+  "description": "Auto-update hook for betoo plugin",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/bin/avad-update-check",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -76,4 +76,6 @@ mkdir -p "${CLAUDE_PLUGIN_DATA:-$HOME/.betoo}/projects"
 echo "betoo ready ($(cat "$BETOO_DIR/VERSION" 2>/dev/null || echo '?'))"
 echo "  skills: $(ls -d "$BETOO_DIR"/skills/*/ 2>/dev/null | wc -l | tr -d ' ')"
 echo "  browse: $BROWSE_BIN"
-[ "$IS_WINDOWS" -eq 1 ] && echo "  platform: Windows (Node.js fallback for Playwright)"
+if [ "$IS_WINDOWS" -eq 1 ]; then
+  echo "  platform: Windows (Node.js fallback for Playwright)"
+fi
